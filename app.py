@@ -26,6 +26,9 @@ while True:
     faces = detector(gray)
     hands = mp_hands.process(rgb)
 
+    mouth_landmarks = []
+    hand_landmarks = []
+
     for face in faces:
         # extract facial landmarks from detection
         shape = predictor(gray, face)
@@ -35,6 +38,7 @@ while True:
 
         # iterate over each landmark and draw 
         for landmark in mouth:
+            mouth_landmarks.append((landmark.x, landmark.y))
             cv2.circle(frame, (landmark.x, landmark.y), 2, (0, 255, 0), -1)
 
     # check if hand is detected
@@ -46,8 +50,19 @@ while True:
                 h, w, c = frame.shape
                 # convert normalized position to pixel coordinates in frame
                 cx, cy = int(landmark.x * w), int(landmark.y * h)
+                hand_landmarks.append((cx, cy))
                 cv2.circle(frame, (cx, cy), 5, (255, 0, 0), cv2.FILLED)
+            
     
+    # check if any hand landmark is in proximity of mouth landmarks
+    for hand_point in hand_landmarks:
+        for mouth_point in mouth_landmarks:
+            # sqrt((x1 - x2)**2 + (y1-y2)**2)
+            distance = ((hand_point[0] - mouth_point[0]) ** 2 + (hand_point[1] - mouth_point[1]) ** 2) ** 0.5
+
+            if distance < 50:
+                print("hands off!!")
+                
     # display the resulting frame
     cv2.imshow('Frame', frame)
 
