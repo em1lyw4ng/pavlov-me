@@ -2,6 +2,7 @@ import cv2
 import dlib
 import time
 import mediapipe as mp
+import playsound as playsound
 
 # initialize camera
 cap = cv2.VideoCapture(0)
@@ -71,14 +72,13 @@ while True:
                 if distance < 50 and not hands_on:
                     hands_on = True
                     last_detection_time = current_time
-                    print("hands off!!")
+                    playsound.playsound("assets/beep_sound.mp3")
                 
     # display the resulting frame
     cv2.imshow('Frame', frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-
 
 cap.release()
 cv2.destroyAllWindows()
